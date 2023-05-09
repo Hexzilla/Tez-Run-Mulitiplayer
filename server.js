@@ -380,7 +380,7 @@ io.on("connection", function (socket) {
   }); //END_SOCKET_ON
 }); //END_IO.ON
 
-http.listen(process.env.PORT || 8000, function () {
-  console.log("listening on *:8000");
+http.listen(process.env.PORT || 8040, function () {
+  console.log("listening on *:8040");
 });
 console.log("------- server is running -------");
