@@ -7,6 +7,7 @@ let app = express(); // create an object of the express module
 let http = require("http").Server(app); // create a http web server using the http library
 let io = require("socket.io")(http); // import socketio communication module
 let _ = require("underscore");
+let nsp = io.of('/wsapp');  // this is what needs to happen
 
 app.use(
   "/public/TemplateData",
@@ -30,7 +31,7 @@ function getDistance(x1, y1, x2, y2) {
 }
 
 //open a connection with the specific client
-io.on("connection", function (socket) {
+nsp.on("connection", function (socket) {
   //print a log in node.js command prompt
   console.log("A user ready for connection!");
 
