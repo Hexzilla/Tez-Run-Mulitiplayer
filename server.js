@@ -7,7 +7,7 @@ let app = express(); // create an object of the express module
 let http = require("http").Server(app); // create a http web server using the http library
 let io = require("socket.io")(http); // import socketio communication module
 let _ = require("underscore");
-let nsp = io.of('/wsapp');  // this is what needs to happen
+let nsp = io.of('/');  // this is what needs to happen
 
 app.use(
   "/public/TemplateData",
