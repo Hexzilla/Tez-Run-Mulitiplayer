@@ -22,6 +22,7 @@ const NUMBER_OF_HORSES = 4;
 let clients = []; // to storage clients
 let clientLookup = {}; // clients search engine
 let sockets = {}; //// to storage sockets
+let finishedHorses = [];
 
 function getDistance(x1, y1, x2, y2) {
   let y = x2 - x1;
@@ -67,7 +68,7 @@ nsp.on("connection", function (socket) {
   //create a callback fuction to listening EmitJoin() method in NetworkMannager.cs unity script
   socket.on("JOIN", function (data) {
     console.log("[INFO] JOIN received !!! ", socket.id, data);
-
+    let isHost = clients.length == 0;
     // fills out with the information emitted by the player in the unity
     currentUser = {
       name: data.name || `Player${clients.length}`,
@@ -83,6 +84,7 @@ nsp.on("connection", function (socket) {
       muteAll: false,
       isMute: true,
       isReady: false,
+      isHost : isHost
     }; //new user  in clients list
 
     console.log("[INFO] player " + currentUser.name + ": logged!");
@@ -115,6 +117,19 @@ nsp.on("connection", function (socket) {
     //spawn currentUser client on clients in broadcast
     socket.broadcast.emit("SPAWN_PLAYER", playerInfo);
   }); //END_SOCKET_ON
+  
+  socket.on("FINISH_HORSE", function (data) {
+    console.log("FINISH_HORSE", currentUser.name);
+    if (currentUser && currentUser.isHost) {
+      console.log("FINISH_HORSE_Accepted", data);
+      finishedHorses.push(data);
+      if(finishedHorses.length == NUMBER_OF_HORSES){
+      console.log("Finish_RACE", finishedHorses);
+      broadcast("Finish_RACE", finishedHorses);
+        finishedHorses = [];
+      }
+    }
+  });
 
   socket.on("READY", function (data) {
     console.log("READY", currentUser);
@@ -373,8 +388,12 @@ nsp.on("connection", function (socket) {
           clients[i].name == currentUser.name &&
           clients[i].id == currentUser.id
         ) {
+          let needToResetHost = currentUser.isHost && clients.length > 1;
           console.log("User " + clients[i].name + " has disconnected");
           clients.splice(i, 1);
+          if(needToResetHost){
+            clients[0].isHost = true;
+          }
         }
       }
     }
